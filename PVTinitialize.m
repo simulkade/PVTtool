@@ -43,7 +43,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 %}
 
 
-current_path = pwd;
+p = mfilename('fullpath');
+file_name = mfilename;
+current_path = p(1:end-1-length(file_name));
+
 addpath([current_path '/PureData']);
 addpath([current_path '/Tools']);
 addpath([current_path '/EOS']);
