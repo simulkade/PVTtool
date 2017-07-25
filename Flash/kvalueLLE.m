@@ -1,5 +1,4 @@
-function ki = kvalueLLE(component, BIP, liquid_x, vapor_y, pressure, ...
-        temperature, eosf, mixrule, activityfun)
+function ki = kvalueLLE(mixture, thermo, liquid_x, vapor_y)
 % 
 % SYNOPSIS:
 %   
@@ -44,10 +43,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 %}
 
 
-[zl,zv,liq_fug,hh]=eosf(component, BIP, liquid_x, pressure, temperature, ...
-        mixrule, activityfun, 1, 1);
-[zl,zv,vap_fug,hh]=eosf(component, BIP, vapor_y, pressure, temperature, ...
-        mixrule, activityfun, 1, 1);
+thermo.phase=1;
+thermo.fugacity_switch=1; % switch on
+eosf = thermo.EOS;
+mixture1 = mixture;
+mixture1.mole_fraction = liquid_x;
+[zl,zv,liq_fug,hh]=eosf(mixture1, thermo);
+thermo.phase=1;
+mixture1.mole_fraction = vapor_y;
+[zl,zv,vap_fug,hh]=eosf(mixture1, thermo);
 % [zl,zv,vap_fug,hh]=EOS(critical_temp,critical_pres,vapor_y, ...
 %     acentric_fact,[0 0;0 0],pressure,temperature,eos_type,1,2);
 N = length(liquid_x);
