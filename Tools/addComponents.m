@@ -48,8 +48,6 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 %}
 
-
-load puredata.mat; % load the physical properties of pure components
 component = struct([]); % define an array of component structure
 N = length(component_name_formula);
 data_index = zeros(1,N);
