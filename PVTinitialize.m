@@ -57,5 +57,5 @@ addpath([current_path '/MixingRules']);
 % addpath([current_path '/PVTclasses']);
 addpath([current_path '/TransportProperties']);
 addpath([current_path '/Classes']);
-load puredata.mat % I'm sure the loaded data has no conflict with the matlab functions
+% load puredata.mat % I'm sure the loaded data has no conflict with the matlab functions
 
