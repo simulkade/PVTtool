@@ -92,11 +92,13 @@ All BIP fields: `EOScons`, `EOStdep`, `NRTLcons`, `NRTLtdep`, `NRTLtdep2`, `NRTL
 
 | Function | Description |
 |---|---|
-| `vleflash(mix, thermo, opts)` | VLE flash, vapor fraction ∈ [0, 1] |
+| `vleflash(mix, thermo, opts)` | VLE flash, vapor fraction ∈ [0, 1]; GDEM acceleration |
 | `vleflashnegative(mix, thermo, opts)` | VLE flash, extended vapor fraction (negative saturation) |
 | `lleflash(mix, thermo, opts)` | LLE flash (two liquid phases) |
-| `bubbleTemperature(mix, thermo, opts)` | Bubble-point temperature at fixed P |
-| `dewTemperature(mix, thermo, opts)` | Dew-point temperature at fixed P |
+| `bubblePressure(mix, thermo, opts)` | Bubble-point pressure at fixed T; returns `(P_bub, y, flag)` |
+| `bubbleTemperature(mix, thermo, opts)` | Bubble-point temperature at fixed P; returns `(T_bub, y, flag)` |
+| `dewPressure(mix, thermo, opts)` | Dew-point pressure at fixed T; returns `(P_dew, x, flag)` |
+| `dewTemperature(mix, thermo, opts)` | Dew-point temperature at fixed P; returns `(T_dew, x, flag)` |
 
 ### Stability tests
 
@@ -110,13 +112,25 @@ All BIP fields: `EOScons`, `EOStdep`, `NRTLcons`, `NRTLtdep`, `NRTLtdep2`, `NRTL
 
 ### EOS functions
 
-All EOS functions share the signature `[liquid_z, vapor_z, fugacity, HR] = EOS(mixture, thermo)`.
+Basic signature: `[liquid_z, vapor_z, fugacity, HR] = EOS(mixture, thermo)`  
+Extended signature (5th output): `[..., props] = EOS(mixture, thermo)` where `props` contains `HR`, `SR`, `GR`, `VR`, `Cp_R`, `Cv_R`.
 
 | Function | Description |
 |---|---|
 | `PREOS` | Peng-Robinson (1976) |
 | `SRKEOS` | Soave-Redlich-Kwong (1972) |
 | `PR78EOS` | Peng-Robinson with 1978 alpha correction (better for ω > 0.491) |
+
+**Residual properties** (from the optional `props` struct):
+
+| Property | Units | Description |
+|---|---|---|
+| `props.HR` | J/mol | Residual enthalpy |
+| `props.SR` | J/(mol·K) | Residual entropy |
+| `props.GR` | J/mol | Residual Gibbs energy |
+| `props.VR` | m³/mol | Residual molar volume = RT(Z-1)/P |
+| `props.Cp_R` | J/(mol·K) | Residual isobaric heat capacity |
+| `props.Cv_R` | J/(mol·K) | Residual isochoric heat capacity |
 
 ### Activity models
 
@@ -174,7 +188,7 @@ cd Tests
 run_all_tests
 ```
 
-Tests cover: class construction, EOS Z-factors, VLE flash vs experimental data, and stability test stable/unstable cases.
+Tests cover: class construction, EOS Z-factors and residual properties, VLE flash vs experimental data, stability test stable/unstable cases, and bubble/dew point calculations.
 
 ---
 

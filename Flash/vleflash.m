@@ -59,7 +59,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 %}
 
     
-    eps1 = options.accuracy; 
+    eps1 = options.accuracy;
     max_itr = options.iteration;
     %Initial estimate for k-values using an empirical equation
     ki = kval_estimate(mixture);
@@ -70,6 +70,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     error2=1;
     error3=1;
     j=0;
+    % GDEM acceleration history (log K vectors from last 3 iterations)
+    lnK_n2 = log(max(ki, 1e-300));
+    lnK_n1 = lnK_n2;
     while ((error1>eps1) || (error2>eps1) || (error3>eps1))
     j=j+1;
     if (j>max_itr)  %check the maximum number of itr to avoid infinite loop
@@ -78,35 +81,46 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     [f, dfdv] = massbalfunc(composition, ki, vapor_frac);
     %New value for variable vapor_frac using Newton's method:
     vapor_frac=vapor_frac-f/dfdv;
-    %physical constraint on vapor_frac
-%     ss = 0.7;
-%     dvf = f/dfdv;
-%     while ((vapor_frac_new<0) || (vapor_frac_new>1))
-%         dvf = ss*dvf;        
-%         vapor_frac_new=vapor_frac-dvf;
-%     end
-%     vapor_frac = vapor_frac_new;
     if (vapor_frac<0)
       vapor_frac=0;
     elseif (vapor_frac>1)
       vapor_frac=1;
     end
-    
+
     [liquid_x, vapor_y] = xy_calc(composition, vapor_frac, ki);
-    
+
     error1=abs(sum(liquid_x)-1);
     error2=abs(sum(vapor_y)-1);
     %Another if statement based on my experience:
     if (abs(dfdv)<eps1)
         error3=f;
-    else                  
+    else
         error3=abs(f/dfdv);
     end
     % normalize the mole fractions
     liquid_x = mynormalize(liquid_x);
     vapor_y = mynormalize(vapor_y);
-    
+
     ki = kvalue(mixture, thermo, liquid_x, vapor_y);
+
+    % GDEM (Dominant Eigenvalue Method) acceleration every 5 steps
+    lnK_curr = log(max(ki, 1e-300));
+    if mod(j, 5) == 0 && j >= 10
+        dg1 = lnK_curr - lnK_n1;   % most recent SS step
+        dg2 = lnK_n1   - lnK_n2;   % previous SS step
+        dg2_sq = sum(dg2.^2);
+        if dg2_sq > 1e-20
+            lambda = sum(dg1.*dg2) / dg2_sq;
+            if lambda > 0.01 && lambda < 0.99
+                % Extrapolate to approximate fixed point
+                lnK_acc = lnK_curr + lambda/(1-lambda) * dg1;
+                ki = exp(lnK_acc);
+                lnK_curr = lnK_acc;
+            end
+        end
+    end
+    lnK_n2 = lnK_n1;
+    lnK_n1 = lnK_curr;
     end
   
   % Final physical constraint for 1-phase result
