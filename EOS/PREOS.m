@@ -1,21 +1,40 @@
 function [liquid_z, vapor_z, fugacity, HR] = PREOS(mixture, thermo)
-% T and critical temperature in [K]
-% P and critical pressure in [bar]
-% HR in [J/mol]
-% 
-% SYNOPSIS:
-%   
-% 
+% PREOS  Peng-Robinson Equation of State (1976).
+%
+%   [liquid_z, vapor_z, fugacity, HR] = PREOS(mixture, thermo)
+%
+%   Computes compressibility factors, fugacity coefficients, and residual
+%   enthalpy for a mixture at the conditions stored in MIXTURE.
+%   Supports van der Waals (rule 1), Huron-Vidal (rule 2), MHV1 (rule 3),
+%   and MHV2 (rule 4) mixing rules.
+%
 % PARAMETERS:
-%   
-% 
+%   mixture  - Mixture object; relevant fields:
+%              .temperature  [K]
+%              .pressure     [Pa]
+%              .mole_fraction [1 x N]
+%              .components   [1 x N Component array]  (Tc, Pc, acentric_factor)
+%              .bip          BIP object (EOScons, EOStdep for rule 1)
+%   thermo   - ThermoModel object; relevant fields:
+%              .mixingrule       1=vdW, 2=HV, 3=MHV1, 4=MHV2
+%              .activity_model   function handle (used for rules 2-4)
+%              .phase            1=liquid (use Zl), 2=vapor (use Zv)
+%              .fugacity_switch  1=compute fugacity, 0=skip
+%
 % RETURNS:
-%   
-% 
+%   liquid_z  - liquid compressibility factor (smallest real root)
+%   vapor_z   - vapor compressibility factor (largest real root)
+%   fugacity  - [1 x N] fugacity coefficients × xi × P  [Pa]
+%               (zero vector if thermo.fugacity_switch == 0)
+%   HR        - residual molar enthalpy [J/mol]
+%
 % EXAMPLE:
-% 
-% SEE ALSO:
-%     
+%   [comp, ~] = addComponents({'CH4'});
+%   mix = Mixture(comp, 300, 10e6);
+%   th = ThermoModel();  th.phase = 2;
+%   [Zl, Zv, fug, HR] = PREOS(mix, th);
+%
+% SEE ALSO: SRKEOS, PR78EOS, mixing_rule, ThermoModel
 
 %{
 Copyright (c) 2012, 2013, Ali Akbar Eftekhari
@@ -123,21 +142,21 @@ if (fug_need==1)
             *log((zz+2.414*b*p/(R*T))/(zz-0.414*b*p/(R*T)));
         fugacity=exp(part1+part3);
     elseif (mixing_rule_num==2)  %Huron Vidal mixing rule
-        [~, gama] = activityfun(T, x, component, BIP);
+        [~, gama] = activityfun(T, x, mixture.components, BIP);
         part1 = bi/b*(zz-1)-log(zz-b*p/(R*T));
-        part3 = -1/(2*sqrt(2))*(ai./bi/R/T - ... 
+        part3 = -1/(2*sqrt(2))*(ai./bi/R/T - ...
                    log(gama)/0.623225)* ...
                    log((zz+(1+sqrt(2))*B_coef)/(zz+(1-sqrt(2))*B_coef));
         fugacity = exp(part1+part3);
     elseif (mixing_rule_num==3) % MHV1 mixing rule
-        [~, gama] = activityfun(T, x, component, BIP);
+        [~, gama] = activityfun(T, x, mixture.components, BIP);
         q1 = -0.53;  %Michelsen for PR
         logfi = bi/b*(zz-1) - log(zz-B_coef) - 1/(2*sqrt(2))*(ai./(bi*R*T) ...
             + log(gama)/q1+log(b./bi)/q1+(bi/b-1)/q1)*log((zz+(1+sqrt(2))*B_coef)/ ...
             (zz+(1-sqrt(2))*B_coef));
         fugacity = exp(logfi);
     elseif (mixing_rule_num==4) % MHV2 mixing rule
-        [~, gama] = activityfun(T, x, component, BIP);
+        [~, gama] = activityfun(T, x, mixture.components, BIP);
         q1 = -0.4347;
         q2 = -0.003654;
         alphai = ai./(bi*R*T);

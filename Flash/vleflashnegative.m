@@ -1,19 +1,37 @@
-function [vapor_y, liquid_x, vapor_frac]=vleflashnegative(mixture, thermo, options)
-%IMPORTANT: every variable should be in the form of row vectors [1 x N]
-% 
-% SYNOPSIS:
-%   
-% 
+function [vapor_y, liquid_x, vapor_frac] = vleflashnegative(mixture, thermo, options)
+% vleflashnegative  VLE flash allowing negative/extended vapor fractions.
+%
+%   [vapor_y, liquid_x, vapor_frac] = vleflashnegative(mixture, thermo, options)
+%
+%   Extends vleflash to handle conditions outside the two-phase envelope
+%   (negative saturation method).  The Rachford-Rice equation is solved
+%   over the full extended range using Newton-Raphson with a bisection
+%   fallback.  Vapor fraction is NOT clipped to [0, 1] during iteration,
+%   enabling calculation along saturation curves (bubble/dew tracing).
+%   All composition vectors are row vectors [1 x N].
+%
 % PARAMETERS:
-%   
-% 
+%   mixture    - Mixture object with temperature, pressure, mole_fraction,
+%                components, and bip fields
+%   thermo     - ThermoModel object specifying EOS and mixing rule
+%   options    - FlashOptions object (or struct) with fields:
+%                  accuracy  — convergence tolerance on fugacity equality
+%                  iteration — (unused in this algorithm; kept for compatibility)
+%
 % RETURNS:
-%   
-% 
+%   vapor_y    - [1 x N] vapor-phase mole fractions
+%   liquid_x   - [1 x N] liquid-phase mole fractions
+%   vapor_frac - scalar; may be outside [0, 1] when in single-phase region
+%
 % EXAMPLE:
-% 
-% SEE ALSO:
-%     
+%   [comp, ~] = addComponents({'CH4O', 'H2O'});
+%   mix = Mixture(comp, 322.91, 26131);
+%   mix.bip.EOScons = [0 -0.07; -0.07 0];
+%   thermo = ThermoModel();
+%   opts = FlashOptions();
+%   [y, x, V] = vleflashnegative(mix, thermo, opts);
+%
+% SEE ALSO: vleflash, bisection, RachfordRiceNR, FlashOptions
 
 %{
 Copyright (c) 2012, 2013, Ali Akbar Eftekhari

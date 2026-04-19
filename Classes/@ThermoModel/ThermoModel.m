@@ -1,11 +1,15 @@
-function [component, flag] = addComponents(component_name_formula)
-% addComponents  Load Component objects from the pure-component database.
+classdef ThermoModel
+% ThermoModel  Thermodynamic model configuration for flash calculations.
 %
-%   [component, flag] = addComponents({'CH4', 'C2H6', ...})
+%   thermo = ThermoModel()
 %
-%   Returns a Component array. flag contains indices of names not found.
-%
-% SEE ALSO: Component.fromDatabaseArray
+%   Default: Peng-Robinson EOS, NRTL activity model, van der Waals mixing.
+%   Override properties as needed:
+%     thermo.EOS            = @PREOS   % or @SRKEOS, @PR78EOS
+%     thermo.activity_model = @NRTL    % or @Wilson, @UNIQUAC, @Margules2
+%     thermo.mixingrule     = 1        % 1=vdW, 2=HV, 3=MHV1, 4=MHV2
+%     thermo.phase          = 1        % 1=liquid, 2=vapor
+%     thermo.fugacity_switch = 1       % 1=compute fugacity, 0=skip
 
 %{
 Copyright (c) 2012, 2013, Ali Akbar Eftekhari
@@ -35,4 +39,16 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 %}
 
-[component, flag] = Component.fromDatabaseArray(component_name_formula);
+    properties
+        EOS             = @PREOS
+        activity_model  = @NRTL
+        mixingrule      = 1
+        phase           = 1
+        fugacity_switch = 1
+    end
+
+    methods
+        function obj = ThermoModel()
+        end
+    end
+end

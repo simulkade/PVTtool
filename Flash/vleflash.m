@@ -1,19 +1,34 @@
-function [vapor_y, liquid_x, vapor_frac]=vleflash(mixture, thermo, options)
-%IMPORTANT: every variable should be in the form of row vectors [1 x N]
-% 
-% SYNOPSIS:
-%   
-% 
+function [vapor_y, liquid_x, vapor_frac] = vleflash(mixture, thermo, options)
+% vleflash  Isothermal Vapor-Liquid Equilibrium flash at fixed T and P.
+%
+%   [vapor_y, liquid_x, vapor_frac] = vleflash(mixture, thermo, options)
+%
+%   Solves the Rachford-Rice equation by Newton-Raphson successive
+%   substitution.  Vapor fraction is constrained to [0, 1].
+%   All composition vectors are row vectors [1 x N].
+%
 % PARAMETERS:
-%   
-% 
+%   mixture    - Mixture object with temperature, pressure, mole_fraction,
+%                components, and bip fields
+%   thermo     - ThermoModel object specifying EOS and mixing rule
+%   options    - FlashOptions object (or struct) with fields:
+%                  accuracy  — convergence tolerance (default 1e-7)
+%                  iteration — maximum iterations (default 100)
+%
 % RETURNS:
-%   
-% 
+%   vapor_y    - [1 x N] vapor-phase mole fractions
+%   liquid_x   - [1 x N] liquid-phase mole fractions
+%   vapor_frac - scalar vapor mole fraction in [0, 1]
+%
 % EXAMPLE:
-% 
-% SEE ALSO:
-%     
+%   [comp, ~] = addComponents({'CH4', 'C10H22'});
+%   mix = Mixture(comp, 300, 5e6);
+%   mix.mole_fraction = [0.5 0.5];
+%   thermo = ThermoModel();
+%   opts = FlashOptions();
+%   [y, x, V] = vleflash(mix, thermo, opts);
+%
+% SEE ALSO: vleflashnegative, stabilityTest, FlashOptions
 
 %{
 Copyright (c) 2012, 2013, Ali Akbar Eftekhari

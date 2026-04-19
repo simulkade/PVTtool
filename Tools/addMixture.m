@@ -1,52 +1,39 @@
-function mixture =  addMixture(components, T_K, p_Pa)
-% This function creates a mixture structure
-% 
-% SYNOPSIS:
-%   
-% 
-% PARAMETERS:
-%   
-% 
-% RETURNS:
-%   
-% 
-% EXAMPLE:
-% 
-% SEE ALSO:
-%     
+function mixture = addMixture(components, T_K, p_Pa)
+% addMixture  Create a Mixture object from a Component array.
+%
+%   mixture = addMixture(components, T_K, p_Pa)
+%
+%   Returns a Mixture with equimolar composition and zeroed BIP.
+%   Adjust mixture.mole_fraction and mixture.bip fields after construction.
+%
+% SEE ALSO: Mixture
 
 %{
 Copyright (c) 2012, 2013, Ali Akbar Eftekhari
 All rights reserved.
 
-Redistribution and use in source and binary forms, with or 
-without modification, are permitted provided that the following 
+Redistribution and use in source and binary forms, with or
+without modification, are permitted provided that the following
 conditions are met:
 
-    *   Redistributions of source code must retain the above copyright notice, 
+    *   Redistributions of source code must retain the above copyright notice,
         this list of conditions and the following disclaimer.
-    *   Redistributions in binary form must reproduce the above 
-        copyright notice, this list of conditions and the following 
-        disclaimer in the documentation and/or other materials provided 
+    *   Redistributions in binary form must reproduce the above
+        copyright notice, this list of conditions and the following
+        disclaimer in the documentation and/or other materials provided
         with the distribution.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, 
-THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR 
-PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR 
-CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
-EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
-PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, 
-OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF 
-LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING 
-NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
+OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 %}
 
-mixture = struct();
-mixture.bip = zeroBIP(components);
-mixture.components = components;
-n = length(components);
-mixture.mole_fraction = 1./(n*ones(1,n));
-mixture.pressure = p_Pa; %[Pa]
-mixture.temperature = T_K; % [K]
+mixture = Mixture(components, T_K, p_Pa);

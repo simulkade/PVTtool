@@ -1,21 +1,26 @@
-function [liquid_z, vapor_z, fugacity, HR]=SRKEOS(mixture, thermo)
-% T and critical temperature in [K]
-% P and critical pressure in [bar]
-% HR in []
-% 
-% SYNOPSIS:
-%   
-% 
+function [liquid_z, vapor_z, fugacity, HR] = SRKEOS(mixture, thermo)
+% SRKEOS  Soave-Redlich-Kwong Equation of State (1972).
+%
+%   [liquid_z, vapor_z, fugacity, HR] = SRKEOS(mixture, thermo)
+%
+%   Computes compressibility factors and fugacity coefficients using the
+%   SRK EOS.  Supports van der Waals (rule 1), Huron-Vidal (rule 2),
+%   MHV1 (rule 3), and MHV2 (rule 4) mixing rules.
+%   HR is set to 0 (residual enthalpy calculation not implemented).
+%
 % PARAMETERS:
-%   
-% 
+%   mixture  - Mixture object; relevant fields:
+%              .temperature, .pressure, .mole_fraction, .components, .bip
+%   thermo   - ThermoModel object; relevant fields:
+%              .mixingrule, .activity_model, .phase, .fugacity_switch
+%
 % RETURNS:
-%   
-% 
-% EXAMPLE:
-% 
-% SEE ALSO:
-%     
+%   liquid_z  - liquid compressibility factor
+%   vapor_z   - vapor compressibility factor
+%   fugacity  - [1 x N] fugacities [Pa]  (zero if fugacity_switch == 0)
+%   HR        - 0 (placeholder; not computed for SRK)
+%
+% SEE ALSO: PREOS, PR78EOS, ThermoModel
 
 %{
 Copyright (c) 2012, 2013, Ali Akbar Eftekhari
@@ -135,7 +140,7 @@ if (fug_need==1)
    elseif (mixing_rule_num==2) %HV mixing rule
        alphai = ai./(bi*R*T);
        alpha = a/(b*R*T);
-       [~, gama] = activityfun(T, x, component, BIP);
+       [~, gama] = activityfun(T, x, mixture.components, BIP);
        alphabari = alphai-log(gama)/s1;
        logfi = log(1/(zz-B_coef))+((p/(R*T))/(zz-B_coef) ...
            -(p*alpha/(R*T))/(zz+B_coef))*bi- ...
@@ -146,7 +151,7 @@ if (fug_need==1)
        q2 = 0.0;
        alphai = ai./(bi*R*T);
        alpha = a/(b*R*T);
-       [~, gama] = activityfun(T, x, component, BIP);
+       [~, gama] = activityfun(T, x, mixture.components, BIP);
        alphabari = 1/(q1+2*alpha*q2)*(q1*alphai+q2*(alpha^2+alphai.^2)+ ...
            log(gama)+log(b./bi)+bi/b-1);
        logfi = log(1/(zz-B_coef))+((p/(R*T))/(zz-B_coef) ...
@@ -158,7 +163,7 @@ if (fug_need==1)
        q2 = -0.0047;
        alphai = ai./(bi*R*T);
        alpha = a/(b*R*T);
-       [~, gama] = activityfun(T, x, component, BIP);
+       [~, gama] = activityfun(T, x, mixture.components, BIP);
        alphabari = 1/(q1+2*alpha*q2)*(q1*alphai+q2*(alpha^2+alphai.^2)+ ...
            log(gama)+log(b./bi)+bi/b-1);
        logfi = log(1/(zz-B_coef))+((p/(R*T))/(zz-B_coef) ...

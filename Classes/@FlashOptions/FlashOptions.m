@@ -1,11 +1,20 @@
-function [component, flag] = addComponents(component_name_formula)
-% addComponents  Load Component objects from the pure-component database.
+classdef FlashOptions
+% FlashOptions  Convergence settings for flash and stability calculations.
 %
-%   [component, flag] = addComponents({'CH4', 'C2H6', ...})
+%   opts = FlashOptions()
 %
-%   Returns a Component array. flag contains indices of names not found.
+%   All properties have sensible defaults; override as needed:
+%     opts.accuracy    = 1e-9;   % tighter tolerance for VLE flash
+%     opts.iteration   = 200;    % more iterations for difficult systems
 %
-% SEE ALSO: Component.fromDatabaseArray
+%   Properties used by vleflash / vleflashnegative / lleflash:
+%     accuracy    - convergence tolerance on mole fraction and Rachford-Rice
+%     iteration   - maximum number of successive substitution iterations
+%
+%   Properties used by stabilityTest / stabilityLLETest:
+%     trivialSolutionMaxError - threshold below which solution is trivial
+%     convergenceMaxError     - tolerance for convergence of stability loop
+%     maxIteration            - maximum stability test iterations
 
 %{
 Copyright (c) 2012, 2013, Ali Akbar Eftekhari
@@ -35,4 +44,16 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 %}
 
-[component, flag] = Component.fromDatabaseArray(component_name_formula);
+    properties
+        accuracy                = 1e-7
+        iteration               = 100
+        trivialSolutionMaxError = 1e-5
+        convergenceMaxError     = 1e-10
+        maxIteration            = 50
+    end
+
+    methods
+        function obj = FlashOptions()
+        end
+    end
+end

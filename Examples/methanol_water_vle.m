@@ -46,9 +46,7 @@ thermo1.EOS = @PREOS;
 x_calc=zeros(size(x1));
 y_calc=x_calc;
 mixture1 = addMixture(component, T0(1), p0(1));
-BIP.EOScons = [0 -0.07; -0.07 0];
-BIP.EOStdep = zeros(2);
-mixture1.bip=BIP;
+mixture1.bip.EOScons = [0 -0.07; -0.07 0];
 % Define flash options
 options.accuracy = 1e-7;
 options.iteration = 100;

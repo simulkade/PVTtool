@@ -92,20 +92,10 @@ elseif (mixing_rule_num == 4)   %MHV2 mixing rule
     D = B^2-4*A*C;
     alpha = (-B-sqrt(D))/(2*A);
     a = real(alpha) * b * R * temperature;
-elseif (mixing_rule_num == 4)   %Wong-Sandler mixing rule
-    bipeos = [bip.EOScons]+[bip.EOStdep]*temperature;
-    [gErt, gama] = activitycoef(temperature, x, component, bip);
-    nume1=0;
-    denom1 = 0;
-       for i=1:N
-          denom1 = denom1 + x(i)*ai(i)/bi(i);
-          for j=1:N
-             nume1 = nume1 + x(i)*x(j)*0.5*(bi(i)-ai(i)/(R*temperature)+ ...
-                 bi(j)-ai(j)/(R*temperature))*(1-bipeos(i,j));
-             a=a+x(i)*x(j)*sqrt(ai(i)*ai(j))*(1-BIPs(i,j));
-          end
-       end
-    b = R*temperature*nume1/(R*temperature-(denom1+gErt*R*temperature/Cstar));
-    a = b*R*temperature*(gErt/Cstar+denom1/(R*temperature));
+elseif (mixing_rule_num == 5)   %Wong-Sandler mixing rule (incomplete)
+    % TODO: Wong-Sandler rule is not fully implemented.
+    % Variables Cstar and BIPs are undefined placeholders.
+    error('mixing_rule:notImplemented', ...
+        'Wong-Sandler mixing rule (rule 5) is not yet implemented.');
 end
     

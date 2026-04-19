@@ -10,10 +10,7 @@ thermo1 = addThermo();
 thermo1.EOS = @PREOS;
 mixture1 = addMixture(component, T0, p0);
 mixture1.mole_fraction = [0.1, 0.45, 0.45];
-BIP = struct();
-BIP.EOScons = [0 0.01 0.1; 0.01 0 0.1; 0.1 0.1 0];
-BIP.EOStdep = zeros(3);
-mixture1.bip = BIP;
+mixture1.bip.EOScons = [0 0.01 0.1; 0.01 0 0.1; 0.1 0.1 0];
 % Define flash options
 options.accuracy = 1e-7;
 options.iteration = 100;
