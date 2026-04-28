@@ -1,3 +1,37 @@
-# ignore folders pvt and tests
-pvt/
-tests/
+# Python build artifacts
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+
+# uv — lock file IS committed for reproducible installs; only cache is ignored
+.uv/
+
+# Editable install dist-info
+*.dist-info/
+
+# pytest and coverage
+.pytest_cache/
+.coverage
+htmlcov/
+.cache/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Editor and OS
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*~
